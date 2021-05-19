@@ -1,33 +1,33 @@
 import React, { Component } from "react";
-import StoreContext from "../contexts/storeContext";
-import bugs, { loadBugs } from "../bugs";
-export default class Bugs extends Component {
-  static contextType = StoreContext;
-
-  state = { bugs: [] };
-
+import { connect } from "react-redux";
+import { loadBugs } from "../bugs";
+class Bugs extends Component {
   componentDidMount() {
-    const store = this.context;
-
-    this.unsubscribe = store.subscribe(() => {
-      const bugsInStore = store.getState().entities.bugs.list;
-      this.setState({ bugs: bugsInStore });
-    });
-
-    store.dispatch(loadBugs());
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
+    this.props.loadBugs();
   }
 
   render() {
     return (
       <ul>
-        {this.state.bugs.map((bug) => (
+        {this.props.bugs.map((bug) => (
           <li key={bug.id}>{bug.description}</li>
         ))}
       </ul>
     );
   }
 }
+
+// bugs: state.entities.bugs.list
+const mapStateToProps = (state) => ({
+  bugs: state.entities.bugs.list,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  loadBugs: () => dispatch(loadBugs()),
+});
+
+// Container Component
+// Presentation Component (Bugs)
+
+export default connect(mapStateToProps, mapDispatchToProps)(Bugs);
+// We don't have to subscribe or unsubscribe whenever componentDidMount or UnMount
