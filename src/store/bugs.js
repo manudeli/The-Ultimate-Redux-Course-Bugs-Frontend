@@ -9,7 +9,7 @@ const slice = createSlice({
   initialState: {
     list: [],
     loading: false,
-    lastFetch: null
+    lastFetch: null,
   },
   reducers: {
     bugsRequested: (bugs, action) => {
@@ -28,7 +28,7 @@ const slice = createSlice({
 
     bugAssignedToUser: (bugs, action) => {
       const { id: bugId, userId } = action.payload;
-      const index = bugs.list.findIndex(bug => bug.id === bugId);
+      const index = bugs.list.findIndex((bug) => bug.id === bugId);
       bugs.list[index].userId = userId;
     },
 
@@ -40,10 +40,10 @@ const slice = createSlice({
 
     // resolveBug (command) - bugResolved (event)
     bugResolved: (bugs, action) => {
-      const index = bugs.list.findIndex(bug => bug.id === action.payload.id);
+      const index = bugs.list.findIndex((bug) => bug.id === action.payload.id);
       bugs.list[index].resolved = true;
-    }
-  }
+    },
+  },
 });
 
 export const {
@@ -52,7 +52,7 @@ export const {
   bugAssignedToUser,
   bugsReceived,
   bugsRequested,
-  bugsRequestFailed
+  bugsRequestFailed,
 } = slice.actions;
 export default slice.reducer;
 
@@ -70,35 +70,37 @@ export const loadBugs = () => (dispatch, getState) => {
       url,
       onStart: bugsRequested.type,
       onSuccess: bugsReceived.type,
-      onError: bugsRequestFailed.type
+      onError: bugsRequestFailed.type,
     })
   );
 };
 
-export const addBug = bug =>
+export const addBug = (bug) =>
   apiCallBegan({
     url,
     method: "post",
     data: bug,
-    onSuccess: bugAdded.type
+    onSuccess: bugAdded.type,
   });
 
-export const resolveBug = id =>
-  apiCallBegan({
+export const resolveBug = (id) => {
+  console.log(id);
+  return apiCallBegan({
     // /bugs
     // PATCH /bugs/1
     url: url + "/" + id,
     method: "patch",
     data: { resolved: true },
-    onSuccess: bugResolved.type
+    onSuccess: bugResolved.type,
   });
+};
 
 export const assignBugToUser = (bugId, userId) =>
   apiCallBegan({
     url: url + "/" + bugId,
     method: "patch",
     data: { userId },
-    onSuccess: bugAssignedToUser.type
+    onSuccess: bugAssignedToUser.type,
   });
 
 // Selector
@@ -106,14 +108,14 @@ export const assignBugToUser = (bugId, userId) =>
 // Memoization
 // bugs => get unresolved bugs from the cache
 
-export const getBugsByUser = userId =>
+export const getBugsByUser = (userId) =>
   createSelector(
-    state => state.entities.bugs,
-    bugs => bugs.filter(bug => bug.userId === userId)
+    (state) => state.entities.bugs,
+    (bugs) => bugs.filter((bug) => bug.userId === userId)
   );
 
 export const getUnresolvedBugs = createSelector(
-  state => state.entities.bugs,
-  state => state.entities.projects,
-  (bugs, projects) => bugs.list.filter(bug => !bug.resolved)
+  (state) => state.entities.bugs,
+  (state) => state.entities.projects,
+  (bugs, projects) => bugs.list.filter((bug) => !bug.resolved)
 );

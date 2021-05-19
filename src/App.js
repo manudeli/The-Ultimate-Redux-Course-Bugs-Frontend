@@ -1,4 +1,5 @@
 import "./App.css";
+import Bugs from "./components/Bugs";
 import BugsList from "./components/BugsList";
 import configureStore from "./store/configureStore";
 import { Provider } from "react-redux";
